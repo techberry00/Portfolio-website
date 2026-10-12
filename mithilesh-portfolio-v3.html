@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mithilesh Tumuganti — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Share Tech Mono',monospace;background:#020c14;color:#a8d8f0;}
+
+/* ── GLOBAL SCROLLBAR ── */
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,200,255,.3);border-radius:2px;}
+
+/* ══════════════════════════════════════
+   TERMINAL / JARVIS MODE
+══════════════════════════════════════ */
+#terminal-mode{
+  width:100%;height:100vh;display:flex;flex-direction:column;
+  background:#020c14;position:relative;overflow:hidden;
+  transition:opacity .4s;
+}
+#terminal-mode.hidden{opacity:0;pointer-events:none;position:absolute;}
+
+/* Animated grid background */
+#terminal-mode::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    linear-gradient(rgba(0,200,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,200,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;
+  animation:bgShift 30s linear infinite;
+}
+@keyframes bgShift{to{background-position:40px 40px;}}
+
+/* Scanline */
+#terminal-mode::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px);
+}
+
+/* ── TITLEBAR ── */
+.t-titlebar{
+  position:relative;z-index:10;
+  background:rgba(0,15,30,.95);border-bottom:1px solid rgba(0,200,255,.2);
+  display:flex;align-items:center;padding:0 14px;height:40px;gap:12px;flex-shrink:0;
+}
+.t-dots{display:flex;gap:6px;}
+.t-dot{width:11px;height:11px;border-radius:50%;}
+.t-dot-r{background:#ff5252;box-shadow:0 0 6px #ff5252;}
+.t-dot-y{background:#ffd740;box-shadow:0 0 6px #ffd740;}
+.t-dot-g{background:#69ff47;box-shadow:0 0 6px #69ff47;}
+.t-title{
+  flex:1;text-align:center;font-family:'Orbitron',monospace;
+  font-size:11px;color:rgba(0,200,255,.6);letter-spacing:3px;text-transform:uppercase;
+}
+.t-corner-deco{font-size:10px;color:rgba(0,200,255,.35);letter-spacing:1px;}
+
+/* ── MAIN ── */
+.t-main{display:flex;flex:1;overflow:hidden;position:relative;z-index:5;}
+
+/* ── EXPLORER SIDEBAR ── */
+.t-explorer{
+  width:210px;flex-shrink:0;
+  background:#080f1a;
+  border-right:1px solid rgba(0,200,255,.08);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:width .2s ease;
+}
+.t-explorer.collapsed{width:0;border-right:none;}
+.t-explorer-inner{width:210px;overflow-y:auto;overflow-x:hidden;flex:1;display:flex;flex-direction:column;}
+
+/* Icon bar */
+.t-ex-iconbar{
+  display:flex;align-items:center;justify-content:space-around;
+  padding:10px 8px;border-bottom:1px solid rgba(0,200,255,.07);
+  flex-shrink:0;
+}
+.t-ex-ico{
+  font-size:11px;color:rgba(0,200,255,.25);cursor:pointer;
+  padding:4px 5px;border-radius:2px;transition:color .15s;
+  font-family:'Share Tech Mono',monospace;
+}
+.t-ex-ico:hover,.t-ex-ico.active{color:rgba(0,200,255,.75);}
+
+/* Section */
+.t-ex-section{padding:14px 0 6px;flex-shrink:0;}
+.t-ex-sec-hdr{
+  display:flex;align-items:center;gap:7px;
+  padding:0 12px 8px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:rgba(0,200,255,.5);letter-spacing:1px;
+  cursor:pointer;user-select:none;
+}
+.t-ex-sec-hdr:hover{color:rgba(0,200,255,.8);}
+.t-ex-sec-icon{font-size:12px;color:rgba(0,200,255,.4);}
+.t-ex-loading{
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;
+  color:rgba(0,200,255,.2);padding:4px 14px;
+  animation:ldPulse 1.5s ease-in-out infinite;
+}
+
+/* Activity items */
+.t-ex-item{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:7px 14px;cursor:default;
+  transition:background .15s;
+}
+.t-ex-item:hover{background:rgba(0,200,255,.04);}
+.t-ex-item-dot{
+  width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.t-ex-item-dot-star{background:#00c8ff;box-shadow:0 0 5px #00c8ff;}
+.t-ex-item-dot-push{background:#69ff47;box-shadow:0 0 5px #69ff47;}
+.t-ex-item-dot-fork{background:#c878ff;box-shadow:0 0 5px #c878ff;}
+.t-ex-item-dot-create{background:#ffd740;box-shadow:0 0 5px #ffd740;}
+.t-ex-item-dot-other{background:rgba(0,200,255,.3);}
+.t-ex-item-body{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.t-ex-item-text{
+  font-family:'Share Tech Mono',monospace;font-size:11.5px;
+  color:rgba(168,216,240,.65);line-height:1.4;word-break:break-word;
+}
+.t-ex-item-time{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:rgba(0,200,255,.25);
+}
+
+/* Tips box */
+.t-ex-tips-box{
+  margin:4px 12px 10px;padding:12px 14px;
+  border:1px solid rgba(0,200,255,.15);
+  background:rgba(0,200,255,.02);
+}
+.t-ex-tip{
+  font-family:'Share Tech Mono',monospace;font-size:11.5px;
+  color:rgba(168,216,240,.5);line-height:1.9;
+}
+.t-ex-key{color:#00c8ff;}
+
+/* ── CONTENT ── */
+.t-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── PANEL HDR ── */
+.t-panel-hdr{
+  background:rgba(0,10,22,.9);border-bottom:1px solid rgba(0,200,255,.1);
+  padding:5px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.t-panel-tab{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 10px;color:#00c8ff;border-bottom:1px solid #00c8ff;cursor:pointer;}
+.t-panel-tab.off{color:rgba(0,200,255,.3);border-color:transparent;}
+.t-panel-tab.active{color:#00c8ff;border-bottom:1px solid #00c8ff;}
+.t-hdr-deco{margin-left:auto;font-size:10px;color:rgba(0,200,255,.25);letter-spacing:1px;}
+
+/* ── PANELS ── */
+.t-panel{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.t-panel.show{display:flex;}
+
+#t-output{
+  flex:1;padding:14px 16px;overflow-y:auto;line-height:1.8;font-size:13px;
+  scroll-behavior:smooth;
+}
+
+/* ── AUTOCOMPLETE ── */
+.t-suggest{
+  border-top:1px solid rgba(0,200,255,.1);
+  padding:5px 14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  background:rgba(0,5,14,.97);flex-shrink:0;
+  min-height:0;max-height:0;overflow:hidden;
+  transition:max-height .15s ease,padding .15s ease;
+}
+.t-suggest.open{max-height:60px;padding:6px 14px;}
+.t-suggest-label{
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;
+  color:rgba(0,200,255,.25);text-transform:uppercase;flex-shrink:0;margin-right:4px;
+}
+.t-sug{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,200,255,.06);color:rgba(0,200,255,.6);
+  border:1px solid rgba(0,200,255,.18);border-radius:2px;
+  padding:2px 10px;font-size:12px;cursor:pointer;
+  font-family:'Share Tech Mono',monospace;
+  transition:all .12s;white-space:nowrap;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+}
+.t-sug:hover,.t-sug.sel{
+  background:rgba(0,200,255,.18);color:#00c8ff;
+  border-color:rgba(0,200,255,.5);
+  box-shadow:0 0 10px rgba(0,200,255,.15);
+}
+.t-sug.sel{border-color:#00c8ff;}
+.t-sug-match{color:#00c8ff;text-decoration:underline;text-decoration-color:rgba(0,200,255,.4);}
+.t-sug-key{
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px;
+  color:rgba(0,200,255,.3);margin-left:auto;padding-left:10px;flex-shrink:0;
+}
+
+/* ── INPUT ROW ── */
+.t-input-row{
+  border-top:1px solid rgba(0,200,255,.12);padding:9px 14px;
+  display:flex;align-items:center;gap:8px;background:rgba(0,8,18,.95);flex-shrink:0;
+}
+.t-prompt-sym{color:#00c8ff;font-size:14px;text-shadow:0 0 8px rgba(0,200,255,.8);}
+.t-user{color:rgba(0,200,255,.5);font-size:12px;letter-spacing:1px;}
+.t-input-row input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:#a8d8f0;font-family:'Share Tech Mono',monospace;font-size:13px;caret-color:#00c8ff;
+}
+.t-input-row input::placeholder{color:rgba(0,200,255,.2);}
+
+/* ── STATUS BAR ── */
+.t-statusbar{
+  background:rgba(0,200,255,.08);border-top:1px solid rgba(0,200,255,.15);
+  height:24px;display:flex;align-items:center;padding:0 12px;gap:16px;flex-shrink:0;
+}
+.t-si{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(0,200,255,.55);white-space:nowrap;display:flex;align-items:center;gap:5px;text-transform:uppercase;}
+.t-si-dot{width:5px;height:5px;border-radius:50%;background:#00c8ff;box-shadow:0 0 5px #00c8ff;animation:siPulse 2s ease-in-out infinite;}
+@keyframes siPulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+.t-sr{margin-left:auto;display:flex;gap:16px;}
+
+/* ── TERMINAL ELEMENTS ── */
+.ol{margin:1px 0 2px;}
+.ol.mu{color:rgba(0,200,255,.35);font-size:12px;}
+.ol.su{color:#00c8ff;}
+.ol.wa{color:#ffd740;}
+.pl{display:flex;align-items:flex-start;gap:6px;margin:3px 0;}
+
+.tag{display:inline-block;border-radius:2px;padding:1px 7px;font-size:11px;margin:2px 2px;}
+.tag-g{background:rgba(105,255,71,.08);color:#69ff47;border:1px solid rgba(105,255,71,.25);}
+.tag-b{background:rgba(0,200,255,.08);color:#00c8ff;border:1px solid rgba(0,200,255,.2);}
+.tag-y{background:rgba(255,215,64,.08);color:#ffd740;border:1px solid rgba(255,215,64,.2);}
+.tag-p{background:rgba(200,120,255,.08);color:#c878ff;border:1px solid rgba(200,120,255,.2);}
+.tag-o{background:rgba(255,100,0,.08);color:#ff6400;border:1px solid rgba(255,100,0,.2);}
+
+.chip{
+  display:inline-block;background:rgba(0,200,255,.07);color:#00c8ff;
+  border:1px solid rgba(0,200,255,.25);border-radius:2px;padding:1px 8px;
+  cursor:pointer;margin:1px 3px;font-size:12px;transition:all .15s;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+}
+.chip:hover{background:rgba(0,200,255,.18);box-shadow:0 0 10px rgba(0,200,255,.2);}
+
+.t-link{color:#ffd740;text-decoration:none;border-bottom:1px dashed rgba(255,215,64,.4);}
+.t-link:hover{color:#fff;border-bottom-color:#fff;}
+
+.ai-bubble{
+  background:rgba(0,200,255,.05);border-left:2px solid #00c8ff;
+  padding:8px 12px;margin:5px 0 10px;border-radius:0 3px 3px 0;
+  box-shadow:0 0 20px rgba(0,200,255,.05) inset;
+}
+.ai-label{color:#00c8ff;font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;text-transform:uppercase;}
+
+.ld{animation:ldPulse 1.2s ease-in-out infinite;color:#00c8ff;}
+.ld:nth-child(2){animation-delay:.2s;}.ld:nth-child(3){animation-delay:.4s;}
+@keyframes ldPulse{0%,100%{opacity:.2;}50%{opacity:1;}}
+
+.github-event{
+  display:flex;align-items:flex-start;gap:10px;padding:6px 0;
+  border-bottom:1px solid rgba(0,200,255,.07);font-size:12px;
+}
+.ge-icon{color:#00c8ff;flex-shrink:0;margin-top:1px;}
+.ge-meta{color:rgba(0,200,255,.35);font-size:11px;margin-top:2px;}
+
+/* ══════════════════════════════════════
+   JARVIS / NON-TECH MODE
+══════════════════════════════════════ */
+#stark-mode{
+  width:100%;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:#020c14;color:#a8d8f0;
+  font-family:'Rajdhani',sans-serif;
+  opacity:0;pointer-events:none;position:absolute;top:0;left:0;
+  transition:opacity .4s;
+}
+#stark-mode.active{opacity:1;pointer-events:all;position:fixed;inset:0;}
+
+#stark-mode::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    linear-gradient(rgba(0,200,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,200,255,.03) 1px,transparent 1px);
+  background-size:50px 50px;animation:gridShift 25s linear infinite;
+}
+@keyframes gridShift{to{background-position:50px 50px;}}
+
+#stark-mode::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(0,200,255,.06) 0%,transparent 70%);
+}
+
+.s-wrap{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:36px 24px 80px;}
+
+/* ── HEADER HUD ── */
+.s-hud{
+  position:relative;padding:32px 36px;margin-bottom:28px;
+  border:1px solid rgba(0,200,255,.2);
+  background:rgba(0,12,28,.8);
+  clip-path:polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 30px 100%, 0 calc(100% - 30px));
+}
+.s-hud::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,200,255,.04) 0%,transparent 60%);
+  pointer-events:none;
+}
+.s-hud-c{position:absolute;width:20px;height:20px;}
+.s-hud-c.tl{top:-1px;left:-1px;border-top:2px solid #00c8ff;border-left:2px solid #00c8ff;}
+.s-hud-c.br{bottom:-1px;right:-1px;border-bottom:2px solid #00c8ff;border-right:2px solid #00c8ff;}
+.s-hud-c.tr{top:-1px;right:28px;border-top:2px solid rgba(0,200,255,.4);border-right:2px solid rgba(0,200,255,.4);}
+.s-hud-c.bl{bottom:-1px;left:28px;border-bottom:2px solid rgba(0,200,255,.4);border-left:2px solid rgba(0,200,255,.4);}
+
+.s-tag{
+  display:inline-block;font-family:'Orbitron',monospace;font-size:9px;
+  letter-spacing:4px;color:rgba(0,200,255,.5);margin-bottom:10px;text-transform:uppercase;
+}
+.s-tag::before{content:'// ';}
+.s-name{
+  font-family:'Orbitron',monospace;font-size:clamp(24px,4.5vw,46px);
+  font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:4px;
+  text-shadow:0 0 40px rgba(0,200,255,.35),0 0 80px rgba(0,200,255,.1);
+}
+.s-role{
+  font-family:'Orbitron',monospace;font-size:clamp(10px,1.5vw,13px);
+  color:rgba(0,200,255,.65);letter-spacing:5px;margin-bottom:18px;text-transform:uppercase;
+}
+.s-bio{
+  color:rgba(168,216,240,.6);font-size:15px;line-height:1.75;max-width:580px;
+  font-family:'Rajdhani',sans-serif;font-weight:400;
+}
+
+.s-stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:22px;}
+.s-stat{
+  position:relative;padding:10px 18px;min-width:90px;
+  border:1px solid rgba(0,200,255,.15);background:rgba(0,200,255,.04);
+  clip-path:polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.s-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#00c8ff,transparent);}
+.s-stat-val{font-family:'Orbitron',monospace;font-size:22px;font-weight:700;color:#00c8ff;line-height:1;}
+.s-stat-lbl{font-size:10px;letter-spacing:2px;color:rgba(0,200,255,.4);margin-top:4px;text-transform:uppercase;font-family:'Orbitron',monospace;}
+
+.arc{
+  width:72px;height:72px;border-radius:50%;flex-shrink:0;
+  border:1px solid rgba(0,200,255,.3);position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.arc::before{
+  content:'';position:absolute;width:52px;height:52px;border-radius:50%;
+  border:1px solid rgba(0,200,255,.2);animation:arcRing 3s ease-in-out infinite;
+}
+.arc::after{
+  content:'';position:absolute;width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(0,200,255,.35);animation:arcRing 2s ease-in-out infinite reverse;
+}
+.arc-inner{
+  width:20px;height:20px;border-radius:50%;z-index:1;
+  background:radial-gradient(circle at 40% 40%,#80eeff,#00a0cc);
+  box-shadow:0 0 20px rgba(0,200,255,.9),0 0 40px rgba(0,200,255,.4);
+  animation:arcGlow 2.5s ease-in-out infinite;
+}
+@keyframes arcRing{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.1);opacity:1;}}
+@keyframes arcGlow{0%,100%{box-shadow:0 0 20px rgba(0,200,255,.9),0 0 40px rgba(0,200,255,.4);}50%{box-shadow:0 0 30px rgba(0,200,255,1),0 0 60px rgba(0,200,255,.6);}}
+
+/* ── SECTION ── */
+.s-section{margin-bottom:24px;}
+.s-sec-hdr{
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:4px;
+  color:rgba(0,200,255,.5);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.s-sec-hdr::before{content:'';width:4px;height:4px;background:#00c8ff;box-shadow:0 0 8px #00c8ff;}
+.s-sec-hdr::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,200,255,.25),transparent);}
+
+/* ── TIMELINE ── */
+.s-timeline{position:relative;padding-left:28px;}
+.s-timeline::before{
+  content:'';position:absolute;left:5px;top:6px;bottom:6px;width:1px;
+  background:linear-gradient(180deg,#00c8ff,rgba(0,200,255,.35) 85%,rgba(0,200,255,.05));
+}
+.s-t-item{position:relative;padding-bottom:22px;}
+.s-t-item:last-child{padding-bottom:0;}
+.s-t-dot{
+  position:absolute;left:-28px;top:5px;width:11px;height:11px;border-radius:50%;
+  background:#020c14;border:2px solid #00c8ff;box-shadow:0 0 10px rgba(0,200,255,.6);
+  z-index:1;
+}
+.s-t-item.dim .s-t-dot{border-color:rgba(0,200,255,.4);box-shadow:0 0 6px rgba(0,200,255,.25);}
+.s-t-card{
+  position:relative;padding:16px 20px;
+  border:1px solid rgba(0,200,255,.15);background:rgba(0,12,28,.7);
+  transition:border-color .25s,box-shadow .25s;
+  clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+.s-t-card:hover{border-color:rgba(0,200,255,.4);box-shadow:0 0 24px rgba(0,200,255,.08),0 0 1px rgba(0,200,255,.3) inset;}
+.s-t-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,200,255,.3),transparent);
+}
+.s-t-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+.s-t-icon{font-size:16px;margin-right:8px;}
+.s-t-title{font-family:'Orbitron',monospace;font-size:13px;color:#a8d8f0;font-weight:600;letter-spacing:.5px;}
+.s-t-date{font-size:11px;color:rgba(0,200,255,.4);font-family:'Orbitron',monospace;letter-spacing:1px;white-space:nowrap;}
+.s-t-sub{font-size:12px;color:rgba(0,200,255,.5);margin-bottom:8px;letter-spacing:.5px;font-family:'Rajdhani',sans-serif;font-weight:500;}
+.s-t-body{font-size:14px;color:rgba(168,216,240,.55);line-height:1.6;font-family:'Rajdhani',sans-serif;}
+.s-t-footer{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;}
+
+/* ── CARDS ── */
+.s-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.s-card{
+  position:relative;padding:20px 22px;
+  border:1px solid rgba(0,200,255,.15);background:rgba(0,12,28,.7);
+  transition:border-color .25s,box-shadow .25s;
+  clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+.s-card:hover{border-color:rgba(0,200,255,.4);box-shadow:0 0 24px rgba(0,200,255,.08),0 0 1px rgba(0,200,255,.3) inset;}
+.s-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,200,255,.3),transparent);
+}
+.s-card-icon{font-size:18px;margin-bottom:10px;opacity:.8;}
+.s-card-title{font-family:'Orbitron',monospace;font-size:13px;color:#a8d8f0;margin-bottom:4px;font-weight:600;letter-spacing:1px;word-break:break-word;}
+.s-card-sub{font-size:12px;color:rgba(0,200,255,.45);margin-bottom:10px;letter-spacing:1px;font-family:'Orbitron',monospace;}
+.s-card-body{font-size:14px;color:rgba(168,216,240,.55);line-height:1.65;font-family:'Rajdhani',sans-serif;}
+.s-card-footer{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;}
+.s-card-links{margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:1px;}
+.s-card-links a{color:rgba(0,200,255,.75);text-decoration:none;border-bottom:1px solid rgba(0,200,255,.25);padding-bottom:1px;}
+.s-card-links a:hover{color:#fff;border-bottom-color:#fff;}
+
+/* ── PILLS ── */
+.s-pill{
+  display:inline-block;border:1px solid rgba(0,200,255,.2);
+  padding:3px 10px;font-size:11px;letter-spacing:1px;
+  color:rgba(0,200,255,.7);background:rgba(0,200,255,.05);
+  font-family:'Orbitron',monospace;text-transform:uppercase;
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+}
+.s-pill-g{border-color:rgba(105,255,71,.2);color:rgba(105,255,71,.7);background:rgba(105,255,71,.05);}
+.s-pill-y{border-color:rgba(255,215,64,.2);color:rgba(255,215,64,.7);background:rgba(255,215,64,.05);}
+
+/* ── SKILLS MATRIX ── */
+.s-skill-group{margin-bottom:18px;}
+.s-skill-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:rgba(0,200,255,.35);margin-bottom:10px;text-transform:uppercase;}
+.s-skill-bar{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.s-skill-name{font-size:13px;color:rgba(168,216,240,.75);min-width:160px;font-family:'Rajdhani',sans-serif;font-weight:500;}
+.s-skill-track{flex:1;height:3px;background:rgba(0,200,255,.08);border-radius:2px;overflow:hidden;}
+.s-skill-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(0,200,255,.4),#00c8ff);position:relative;animation:barGrow 1.2s ease-out both;}
+@keyframes barGrow{from{width:0!important;}}
+.s-skill-fill::after{content:'';position:absolute;right:0;top:-2px;bottom:-2px;width:4px;border-radius:2px;background:#00c8ff;box-shadow:0 0 8px #00c8ff;}
+.s-skill-pct{font-family:'Orbitron',monospace;font-size:10px;color:rgba(0,200,255,.6);min-width:96px;text-align:right;letter-spacing:1px;text-transform:uppercase;}
+
+/* ── GITHUB FEED ── */
+.s-event{
+  display:flex;gap:12px;padding:9px 0;border-bottom:1px solid rgba(0,200,255,.07);
+  align-items:flex-start;
+}
+.s-event-icon{
+  width:28px;height:28px;border-radius:50%;background:rgba(0,200,255,.07);
+  border:1px solid rgba(0,200,255,.15);display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;
+}
+.s-event-text{font-size:14px;color:rgba(168,216,240,.65);line-height:1.5;font-family:'Rajdhani',sans-serif;}
+.s-event-time{font-family:'Orbitron',monospace;font-size:10px;color:rgba(0,200,255,.3);margin-top:3px;letter-spacing:1px;}
+
+/* ── CONTACT LINKS ── */
+.s-link{
+  display:inline-flex;align-items:center;gap:10px;
+  border:1px solid rgba(0,200,255,.2);padding:10px 20px;
+  color:rgba(0,200,255,.75);font-size:14px;text-decoration:none;
+  background:rgba(0,200,255,.04);transition:all .25s;margin:4px 6px 4px 0;
+  font-family:'Rajdhani',sans-serif;font-weight:500;letter-spacing:1px;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+}
+.s-link:hover{border-color:rgba(0,200,255,.6);background:rgba(0,200,255,.1);color:#00c8ff;box-shadow:0 0 20px rgba(0,200,255,.15);}
+.s-link-icon{font-size:18px;}
+
+/* ── SCAN LINE ANIM ── */
+.scan-overlay{
+  position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden;
+}
+.scan-line{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(0,200,255,.15) 30%,rgba(0,200,255,.4) 50%,rgba(0,200,255,.15) 70%,transparent 100%);
+  animation:scanDown 6s linear infinite;
+  box-shadow:0 0 8px rgba(0,200,255,.3);
+}
+@keyframes scanDown{0%{top:-2px;}100%{top:100vh;}}
+
+@keyframes typeIn{from{opacity:0;transform:translateX(-4px);}to{opacity:1;transform:none;}}
+.type-anim{animation:typeIn .15s ease both;}
+
+/* Mobile */
+@media(max-width:640px){
+  .t-explorer{display:none;}
+  #t-output{font-size:12px;padding:8px 10px;}
+  .s-wrap{padding:18px 14px 60px;}
+  .s-name{font-size:22px;}
+  .s-hud{padding:22px 20px;}
+  .s-stats{gap:10px;}
+  .s-skill-name{min-width:110px;}
+  .s-skill-pct{min-width:78px;}
+}
+</style>
+</head>
+<body>
+
+<div class="scan-overlay"><div class="scan-line"></div></div>
+
+<!-- ════════ TERMINAL MODE ════════ -->
+<div id="terminal-mode">
+  <div class="t-titlebar">
+    <div class="t-dots">
+      <div class="t-dot t-dot-r"></div>
+      <div class="t-dot t-dot-y"></div>
+      <div class="t-dot t-dot-g"></div>
+    </div>
+    <div class="t-title">F.R.I.D.A.Y · Mithilesh Tumuganti · Terminal v2.0</div>
+    <div class="t-corner-deco" id="t-time"></div>
+  </div>
+
+  <div class="t-main">
+
+    <!-- ── EXPLORER SIDEBAR ── -->
+    <div class="t-explorer" id="t-explorer">
+      <div class="t-explorer-inner">
+
+        <div class="t-ex-iconbar">
+          <span class="t-ex-ico" title="Copy">🗐</span>
+          <span class="t-ex-ico" title="Problems">🕷️</span>
+          <span class="t-ex-ico active" title="Signal">((•))</span>
+          <span class="t-ex-ico" title="Debug" onclick="selectExplorerIcon(this);switchPanel('debug')" style="cursor:pointer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="1.6"/><line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" stroke-width="1.6"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="1.6"/><line x1="8" y1="18" x2="8" y2="22" stroke="currentColor" stroke-width="1.6"/><line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.6"/><line x1="16" y1="18" x2="16" y2="22" stroke="currentColor" stroke-width="1.6"/></svg></span>
+          <span class="t-ex-ico" title="Network" onclick="selectExplorerIcon(this);switchPanel('ports')" style="cursor:pointer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M3 8.5C8.5 3 15.5 3 21 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.5 12.5C10 9 14 9 17.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9.7 16.3C11 15 13 15 14.3 16.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="20" r="1.4" fill="currentColor"/></svg></span>
+        </div>
+
+        <div class="t-ex-section">
+          <div class="t-ex-sec-hdr" onclick="toggleSection('activity')">
+            <span class="t-ex-sec-icon">↝</span>
+            RECENT ACTIVITY
+          </div>
+          <div id="section-activity">
+            <div id="explorer-activity" class="t-ex-loading">LOADING…</div>
+          </div>
+        </div>
+
+        <div class="t-ex-section">
+          <div class="t-ex-sec-hdr" onclick="toggleSection('tips')">
+            <span class="t-ex-sec-icon">◎</span>
+            TIPS
+          </div>
+          <div id="section-tips">
+            <div class="t-ex-tips-box">
+              <div class="t-ex-tip">Type <span class="t-ex-key">help</span> to explore</div>
+              <div class="t-ex-tip">Try <span class="t-ex-key">projects</span> to see my work</div>
+              <div class="t-ex-tip">Ask <span class="t-ex-key">Friday</span> anything in plain English</div>
+              <div class="t-ex-tip">Use <span class="t-ex-key">non tech</span> for standard UI</div>
+              <div class="t-ex-tip"><span class="t-ex-key">↑ ↓</span> for command history</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="t-content">
+      <div class="t-panel-hdr">
+        <div class="t-panel-tab active" id="tab-terminal" onclick="switchPanel('terminal')">TERMINAL</div>
+        <div class="t-panel-tab off" id="tab-output"   onclick="switchPanel('output')">OUTPUT</div>
+        <div class="t-panel-tab off" id="tab-debug" onclick="switchPanel('debug')">DEBUG CONSOLE</div>
+        <div class="t-panel-tab off" id="tab-ports" onclick="switchPanel('ports')">PORTS</div>
+        <div class="t-hdr-deco" id="t-status-txt">READY</div>
+      </div>
+
+      <div id="panel-terminal" class="t-panel" style="display:flex;flex:1;flex-direction:column;overflow:hidden;">
+        <div id="t-output" style="flex:1;padding:14px 16px;overflow-y:auto;line-height:1.8;font-size:13px;scroll-behavior:smooth;"></div>
+        <div id="t-suggest" class="t-suggest">
+          <span class="t-suggest-label">↹</span>
+        </div>
+        <div class="t-input-row">
+          <span class="t-prompt-sym">▶</span>
+          <span class="t-user">mithilesh@friday</span>
+          <span style="color:rgba(0,200,255,.3)">:~$</span>
+          <input id="t-input" type="text" placeholder="type 'help' to explore…" autocomplete="off" spellcheck="false"/>
+        </div>
+      </div>
+
+      <div id="panel-output" class="t-panel" style="display:none;flex:1;overflow-y:auto;padding:14px 16px;line-height:1.8;font-size:13px;">
+        <div id="output-content"></div>
+      </div>
+
+      <div id="panel-debug" class="t-panel" style="display:none;flex:1;overflow-y:auto;padding:14px 16px;line-height:1.8;font-size:13px;">
+        <div id="debug-content" style="width:100%;"></div>
+      </div>
+
+      <div id="panel-ports" class="t-panel" style="display:none;flex:1;overflow-y:auto;padding:14px 16px;line-height:1.8;font-size:13px;">
+        <div id="ports-content" style="width:100%;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="t-statusbar">
+    <div class="t-si"><div class="t-si-dot"></div>ONLINE</div>
+    <div class="t-si">⎇ MAIN</div>
+    <div class="t-si">✓ SYSTEM NOMINAL</div>
+    <div class="t-sr">
+      <div class="t-si">BSc CS · UNB</div>
+      <div class="t-si">FRIDAY v2.0</div>
+      <div class="t-si">UTF-8</div>
+      <div class="t-si">Saint John, CA</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ JARVIS / STARK MODE ════════ -->
+<div id="stark-mode">
+  <div class="s-wrap">
+
+    <div class="s-hud" style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;">
+      <div class="s-hud-c tl"></div>
+      <div class="s-hud-c br"></div>
+      <div class="s-hud-c tr"></div>
+      <div class="s-hud-c bl"></div>
+      <div style="flex:1;min-width:220px;">
+        <div class="s-tag">Identity Confirmed</div>
+        <div class="s-name">MITHILESH TUMUGANTI</div>
+        <div class="s-role">Computer Science Student</div>
+        <div class="s-bio">CS student at the University of New Brunswick, Saint John (2024–2028). Passionate about technology, design, and community. Active volunteer with experience in event coordination, photography, and social initiatives.</div>
+        <div class="s-stats">
+          <div class="s-stat"><div class="s-stat-val">2028</div><div class="s-stat-lbl">Graduation</div></div>
+          <div class="s-stat"><div class="s-stat-val">5+</div><div class="s-stat-lbl">Vol. Ops</div></div>
+          <div class="s-stat"><div class="s-stat-val" id="s-repos">—</div><div class="s-stat-lbl">Repos</div></div>
+          <div class="s-stat"><div class="s-stat-val">2</div><div class="s-stat-lbl">Countries</div></div>
+        </div>
+        <div id="s-resume-wrap" style="margin-top:18px;display:none;">
+          <a class="s-link" id="s-resume-link" href="#" target="_blank" rel="noopener"><span class="s-link-icon">📄</span> Download Resume</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:6px;">
+        <div class="arc"><div class="arc-inner"></div></div>
+        <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,.35);text-align:center;">ARC<br>ONLINE</div>
+        <button onclick="toggleMode()" style="background:transparent;border:1px solid rgba(0,200,255,.3);color:rgba(0,200,255,.6);padding:5px 12px;cursor:pointer;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);transition:all .2s;" onmouseover="this.style.borderColor='rgba(0,200,255,.7)';this.style.color='#00c8ff'" onmouseout="this.style.borderColor='rgba(0,200,255,.3)';this.style.color='rgba(0,200,255,.6)'">⌨ Terminal</button>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="s-section">
+      <div class="s-sec-hdr">Capability Matrix</div>
+      <div class="s-card" style="clip-path:none;border-radius:0;">
+        <div class="s-skill-group">
+          <div class="s-skill-label">Industry Knowledge</div>
+          <div class="s-skill-bar"><span class="s-skill-name">Photography</span><div class="s-skill-track"><div class="s-skill-fill" style="width:100%"></div></div><span class="s-skill-pct">Strong</span></div>
+          <div class="s-skill-bar"><span class="s-skill-name">Event Photography</span><div class="s-skill-track"><div class="s-skill-fill" style="width:100%"></div></div><span class="s-skill-pct">Strong</span></div>
+          <div class="s-skill-bar"><span class="s-skill-name">Leadership Dev.</span><div class="s-skill-track"><div class="s-skill-fill" style="width:66%"></div></div><span class="s-skill-pct">Comfortable</span></div>
+          <div class="s-skill-bar"><span class="s-skill-name">Graphic Design</span><div class="s-skill-track"><div class="s-skill-fill" style="width:66%"></div></div><span class="s-skill-pct">Comfortable</span></div>
+          <div class="s-skill-bar"><span class="s-skill-name">Volunteering</span><div class="s-skill-track"><div class="s-skill-fill" style="width:100%"></div></div><span class="s-skill-pct">Strong</span></div>
+        </div>
+        <div class="s-skill-group" style="margin-bottom:0">
+          <div class="s-skill-label">Tools & Technologies</div>
+          <div class="s-skill-bar"><span class="s-skill-name">Python</span><div class="s-skill-track"><div class="s-skill-fill" style="width:66%"></div></div><span class="s-skill-pct">Comfortable</span></div>
+          <div class="s-skill-bar"><span class="s-skill-name">MS PowerPoint</span><div class="s-skill-track"><div class="s-skill-fill" style="width:100%"></div></div><span class="s-skill-pct">Strong</span></div>
+          <div class="s-skill-bar"><span class="s-skill-name">Computer Science</span><div class="s-skill-track"><div class="s-skill-fill" style="width:66%"></div></div><span class="s-skill-pct">Comfortable</span></div>
+        </div>
+        <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="s-pill">Photography</span>
+          <span class="s-pill">Event Coord</span>
+          <span class="s-pill">Leadership</span>
+          <span class="s-pill s-pill-y">Python</span>
+          <span class="s-pill s-pill-y">MS PowerPoint</span>
+          <span class="s-pill s-pill-g">Volunteering</span>
+          <span class="s-pill">Graphic Design</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="s-section">
+      <div class="s-sec-hdr">Projects</div>
+      <div id="s-projects" class="s-grid">
+        <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:rgba(0,200,255,.35);animation:ldPulse 1.5s ease-in-out infinite;">LOADING PROJECTS…</div>
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="s-section">
+      <div class="s-sec-hdr">Training Records</div>
+      <div class="s-timeline">
+        <div class="s-t-item">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">🎓</span><span class="s-t-title">BSc Computer Science</span></div>
+              <div class="s-t-date">Sep 2024 – Jan 2028</div>
+            </div>
+            <div class="s-t-sub">University of New Brunswick · Saint John, NB, Canada</div>
+            <div class="s-t-footer"><span class="s-pill s-pill-g">Volunteering</span></div>
+          </div>
+        </div>
+        <div class="s-t-item dim">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">📚</span><span class="s-t-title">High School Diploma</span></div>
+              <div class="s-t-date">Grade 10–12</div>
+            </div>
+            <div class="s-t-sub">New Millennium School Bahrain · Science Stream</div>
+            <div class="s-t-footer">
+              <span class="s-pill">Leadership</span>
+              <span class="s-pill">Photography</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volunteer -->
+    <div class="s-section">
+      <div class="s-sec-hdr">Field Operations</div>
+      <div class="s-timeline">
+        <div class="s-t-item">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">🏫</span><span class="s-t-title">UNB SRC Volunteer</span></div>
+              <div class="s-t-date">May 2025</div>
+            </div>
+            <div class="s-t-sub">University of New Brunswick</div>
+            <div class="s-t-body">Assisted in various tasks for Spring Orientation 2025.</div>
+            <div class="s-t-footer"><span class="s-pill s-pill-g">Events</span></div>
+          </div>
+        </div>
+        <div class="s-t-item">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">💻</span><span class="s-t-title">Programming Competition Invigilator</span></div>
+              <div class="s-t-date">May 2025</div>
+            </div>
+            <div class="s-t-sub">UNBSJ</div>
+            <div class="s-t-body">Invigilated and helped ensure a smooth Saint John High School Programming Competition.</div>
+            <div class="s-t-footer"><span class="s-pill s-pill-y">Science & Tech</span></div>
+          </div>
+        </div>
+        <div class="s-t-item dim">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">📖</span><span class="s-t-title">Charity Book Sale Volunteer</span></div>
+              <div class="s-t-date"></div>
+            </div>
+            <div class="s-t-sub">New Millennium School</div>
+            <div class="s-t-body">Collected and organised a successful charity book fair at school.</div>
+            <div class="s-t-footer"><span class="s-pill">Social Services</span></div>
+          </div>
+        </div>
+        <div class="s-t-item dim">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">🎗</span><span class="s-t-title">Think-Pink Bake Sale</span></div>
+              <div class="s-t-date"></div>
+            </div>
+            <div class="s-t-sub">New Millennium School</div>
+            <div class="s-t-body">Coordinated a charity bake sale for breast cancer awareness.</div>
+            <div class="s-t-footer"><span class="s-pill">Social Services</span></div>
+          </div>
+        </div>
+        <div class="s-t-item dim">
+          <div class="s-t-dot"></div>
+          <div class="s-t-card">
+            <div class="s-t-head">
+              <div><span class="s-t-icon">📸</span><span class="s-t-title">NMMUN Photographer</span></div>
+              <div class="s-t-date"></div>
+            </div>
+            <div class="s-t-sub">New Millennium School — Media Team</div>
+            <div class="s-t-body">Captured key moments as part of the NMMUN Media Team during the Model UN conference.</div>
+            <div class="s-t-footer">
+              <span class="s-pill">Education</span>
+              <span class="s-pill">Photography</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GitHub Live Feed -->
+    <div class="s-section">
+      <div class="s-sec-hdr">Live GitHub Feed</div>
+      <div id="s-github-feed" style="border:1px solid rgba(0,200,255,.1);padding:16px 20px;background:rgba(0,12,28,.7);">
+        <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:rgba(0,200,255,.35);animation:ldPulse 1.5s ease-in-out infinite;">
+          SCANNING REPOSITORIES…
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="s-section">
+      <div class="s-sec-hdr">Communication Channels</div>
+      <div>
+        <a class="s-link" href="https://github.com/techberry00" target="_blank" rel="noopener">
+          <span class="s-link-icon">◉</span> github.com/techberry00
+        </a>
+        <a class="s-link" href="https://linkedin.com/in/mithilesh-t-3781703a2" target="_blank" rel="noopener">
+          <span class="s-link-icon">◈</span> linkedin.com/in/mithilesh-t
+        </a>
+        <a class="s-link" id="s-email-link" href="#" style="display:none;">
+          <span class="s-link-icon">✉</span> <span id="s-email-text">Email</span>
+        </a>
+        <a class="s-link" href="#" onclick="return false;">
+          <span class="s-link-icon">◎</span> Saint John, NB · Canada
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   CONFIG — edit these before deploying
+═══════════════════════════════════════════════ */
+const CONFIG = {
+  // URL of your serverless proxy that holds the Anthropic API key
+  // (see friday-proxy-worker.js). Leave '' to run Friday in offline mode.
+  AI_ENDPOINT: '',
+
+  // Path or URL to your resume PDF, e.g. 'resume.pdf'.
+  // Leave '' and the Resume row/button stays hidden.
+  RESUME_URL: '',
+
+  // Email is assembled at runtime so it isn't sitting in the page source.
+  EMAIL_USER: 'tumuganti.mithilesh',
+  EMAIL_HOST: 'gmail.com'
+};
+const EMAIL = CONFIG.EMAIL_USER + '@' + CONFIG.EMAIL_HOST;
+
+/* ─────────────────────────────── DATA ─── */
+const ME = {
+  name:"Mithilesh Tumuganti",role:"Computer Science Student",
+  location:"Saint John, New Brunswick, Canada",
+  github:"techberry00",linkedin:"linkedin.com/in/mithilesh-t-3781703a2",
+  bio:"CS student at UNB (2024–2028), passionate about tech, design, and community. Active volunteer in event coordination, photography, and social initiatives.",
+  skills:{
+    // level: Strong / Comfortable / Familiar
+    industry:[["Photography","Strong"],["Event Photography","Strong"],["Leadership Development","Comfortable"],["Volunteering","Strong"],["Graphic Design","Comfortable"]],
+    tools:[["Microsoft PowerPoint","Strong"],["Python","Comfortable"],["Computer Science","Comfortable"]]
+  },
+  education:[
+    {degree:"BSc Computer Science",school:"University of New Brunswick",period:"Sep 2024 – Jan 2028",note:"Volunteering"},
+    {degree:"High School Diploma, Science",school:"New Millennium School Bahrain",period:"Grade 10–12",note:"Leadership · Photography"}
+  ],
+  volunteer:[
+    {role:"UNB SRC Volunteer",org:"University of New Brunswick",period:"May 2025",cat:"Events",desc:"Assisted in various tasks for Spring Orientation 2025."},
+    {role:"Programming Competition Invigilator",org:"UNBSJ",period:"May 2025",cat:"Science & Tech",desc:"Invigilated and helped ensure a smooth Saint John HS Programming Competition."},
+    {role:"Charity Book Sale Volunteer",org:"New Millennium School",period:"",cat:"Social Services",desc:"Collected used books and organised a charity book fair at school."},
+    {role:"Think-Pink Bake Sale Volunteer",org:"New Millennium School",period:"",cat:"Social Services",desc:"Coordinated a charity bake sale for breast cancer awareness."},
+    {role:"NMMUN Media Team Photographer",org:"New Millennium School",period:"",cat:"Education",desc:"Captured key moments as part of the NMMUN Media Team."}
+  ],
+  /* Featured projects. Fill this in to control exactly what visitors see.
+     If left empty, your public non-fork GitHub repos are shown instead.
+     Example:
+     {name:"My App", desc:"One line on the problem it solves.", tech:["Python","SQLite"],
+      repo:"https://github.com/techberry00/my-app", demo:"https://example.com"} */
+  projects:[]
+};
+const CHAT_HISTORY=[];
+
+/* ─────────────────────────────── HELPERS ─── */
+function escHtml(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function safeUrl(u){return /^https?:\/\//i.test(u||'')?u:'';}
+function levelPct(level){return level==='Strong'?100:level==='Comfortable'?66:33;}
+function levelColor(level){return level==='Strong'?'#69ff47':level==='Comfortable'?'#00c8ff':'#ffd740';}
+
+/* ─────────────────────────────── EXPLORER SIDEBAR ─── */
+let explorerOpen = true;
+
+function toggleExplorer(){
+  explorerOpen = !explorerOpen;
+  const ex = document.getElementById('t-explorer');
+  ex.classList.toggle('collapsed', !explorerOpen);
+}
+
+function toggleSection(name){
+  const section = document.getElementById('section-'+name);
+  if(!section) return;
+  section.style.display = section.style.display === 'none' ? '' : 'none';
+}
+
+async function loadExplorerActivity(){
+  const el = document.getElementById('explorer-activity');
+  if(!el) return;
+  const events = await fetchGitHub();
+  if(!events || !events.length){
+    el.className='';
+    el.innerHTML = `<div style="font-size:11px;color:rgba(0,200,255,.3);padding:4px 14px;">No recent activity</div>`;
+    return;
+  }
+  el.className='';
+  el.innerHTML = '';
+  events.slice(0,8).forEach(e=>{
+    const {text} = parseEvent(e);
+    const time = relTime(e.created_at);
+    const dotClass = {
+      PushEvent:'push', WatchEvent:'star', ForkEvent:'fork', CreateEvent:'create'
+    }[e.type] || 'other';
+    const div = document.createElement('div');
+    div.className = 't-ex-item';
+    div.innerHTML = `
+      <span class="t-ex-item-dot t-ex-item-dot-${dotClass}"></span>
+      <div class="t-ex-item-body">
+        <div class="t-ex-item-text">${text}</div>
+        <div class="t-ex-item-time">${time}</div>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function selectExplorerIcon(el){
+  document.querySelectorAll('.t-ex-iconbar .t-ex-ico').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ─────────────────────────────── TOGGLE ─── */
+let starkActive=false;
+function toggleMode(){
+  starkActive=!starkActive;
+  const term=document.getElementById('terminal-mode');
+  const stark=document.getElementById('stark-mode');
+  if(starkActive){
+    term.classList.add('hidden');
+    stark.classList.add('active');
+    loadGitHubStark();
+    loadProjectsStark();
+  } else {
+    stark.classList.remove('active');
+    term.classList.remove('hidden');
+  }
+}
+
+/* ─────────────────────────────── PANEL SWITCHER ─── */
+let activePanel = 'terminal';
+
+function switchPanel(name){
+  const prev = activePanel;
+  activePanel = name;
+  ['terminal','output','debug','ports'].forEach(p=>{
+    const tab = document.getElementById('tab-'+p);
+    const panel = document.getElementById('panel-'+p);
+    if(tab) tab.className = p===name ? 't-panel-tab active' : 't-panel-tab off';
+    if(panel) panel.style.display = p===name ? 'flex' : 'none';
+  });
+  if(name==='terminal'){
+    if(prev !== 'terminal') resetTerminal().then(()=>inp.focus());
+    else setTimeout(()=>inp.focus(),50);
+  }
+  if(name==='output' && !document.getElementById('output-content').dataset.loaded){
+    loadOutputPanel();
+  }
+  if(name==='debug'){
+    runDebugConsole();
+  }
+  if(name==='ports' && !document.getElementById('ports-content').dataset.loaded){
+    loadPortsPanel();
+  }
+  const labels={terminal:'INTERACTIVE',output:'READ-ONLY',debug:'RUNTIME LOG',ports:'NETWORK'};
+  setStatus(labels[name]||'READY');
+}
+
+function loadOutputPanel(){
+  const oc = document.getElementById('output-content');
+  oc.dataset.loaded = '1';
+  const lines = [
+    {t:'dim', v:'// simulated build log — just for fun, nothing here actually ran'},
+    {t:'',    v:''},
+    {t:'hdr', v:'> mithilesh-portfolio@2.0.0 build'},
+    {t:'hdr', v:'> tsc --project tsconfig.json && vite build'},
+    {t:'',    v:''},
+    {t:'dim', v:'vite v5.4.2 building for production...'},
+    {t:'',    v:''},
+    {t:'ok',  v:'✓  modules transformed:'},
+    {t:'file',v:'    dist/index.html              2.41 kB'},
+    {t:'file',v:'    dist/assets/friday.core.js   14.8 kB │ gzip: 5.2 kB'},
+    {t:'file',v:'    dist/assets/portfolio.css     8.3 kB │ gzip: 2.1 kB'},
+    {t:'file',v:'    dist/assets/robot.svg         1.9 kB'},
+    {t:'',    v:''},
+    {t:'ok',  v:'✓  built in 1.24s'},
+    {t:'',    v:''},
+    {t:'sep', v:'────────────────────────────────────────'},
+    {t:'',    v:''},
+    {t:'hdr', v:'> eslint src/ --ext .ts'},
+    {t:'',    v:''},
+    {t:'warn',v:'  src/procrastination.ts'},
+    {t:'warn',v:'    3:12  warning  sleep() called more than once  no-sleep'},
+    {t:'warn',v:'    7:4   warning  free_time is undefined         no-undef'},
+    {t:'',    v:''},
+    {t:'dim', v:'  ✖  2 warnings (0 errors)'},
+    {t:'',    v:''},
+    {t:'sep', v:'────────────────────────────────────────'},
+    {t:'',    v:''},
+    {t:'hdr', v:'> node deploy.js --target=production'},
+    {t:'',    v:''},
+    {t:'ok',  v:'  ✓  Connecting to server…'},
+    {t:'ok',  v:'  ✓  Uploading dist/ artifacts…'},
+    {t:'ok',  v:'  ✓  Cache invalidated'},
+    {t:'ok',  v:'  ✓  CDN propagation complete'},
+    {t:'',    v:''},
+    {t:'suc', v:'  🚀  Deployed to production  —  0.8s'},
+    {t:'',    v:''},
+  ];
+
+  const colorMap = {
+    hdr:'#a8d8f0', ok:'#69ff47', suc:'#69ff47', warn:'#ffd740', err:'#ff5252',
+    file:'rgba(0,200,255,.55)', dim:'rgba(0,200,255,.45)', sep:'rgba(0,200,255,.15)', '':'rgba(0,200,255,.15)'
+  };
+  lines.forEach(({t,v})=>{
+    const el = document.createElement('div');
+    el.className = 'ol';
+    el.innerHTML = v ? `<span style="color:${colorMap[t]||colorMap['']}">${escHtml(v)}</span>` : '';
+    oc.appendChild(el);
+  });
+}
+
+function loadPortsPanel(){
+  const pc = document.getElementById('ports-content');
+  pc.dataset.loaded = '1';
+
+  const rows = [
+    {port:'443', proto:'HTTPS', icon:'◈', service:'LinkedIn', info:'Professional network · '+ME.linkedin, action:'Connect', href:'https://'+ME.linkedin},
+    {port:'22',  proto:'SSH/Git', icon:'◉', service:'GitHub', info:'Source code, open-source projects · github.com/'+ME.github, action:'View repos', href:'https://github.com/'+ME.github},
+    {port:'25',  proto:'SMTP', icon:'✉', service:'Email', info:EMAIL+' · Response time: usually fast', action:'Send email', href:'mailto:'+EMAIL},
+  ];
+  // Only list the resume when a real file is configured
+  if(CONFIG.RESUME_URL){
+    rows.push({port:'9000',proto:'FILE', icon:'📄', service:'Resume', info:'Mithilesh Tumuganti — Computer Science Student · PDF', action:'Download', href:CONFIG.RESUME_URL});
+  }
+
+  pc.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#69ff47;box-shadow:0 0 6px #69ff47;display:inline-block;"></span>
+      <span style="color:rgba(168,216,240,.7)">${rows.length} ports open · all services listening</span>
+    </div>
+    <div style="display:grid;grid-template-columns:60px 90px 140px 1fr 110px;gap:0 16px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(0,200,255,.35);padding-bottom:10px;border-bottom:1px solid rgba(0,200,255,.12);text-transform:uppercase;">
+      <div>Port</div><div>Protocol</div><div>Service</div><div>Info</div><div>Action</div>
+    </div>
+    <div id="ports-rows"></div>
+    <div style="margin-top:20px;border:1px solid rgba(0,200,255,.15);padding:14px 18px;background:rgba(0,200,255,.02);">
+      <div style="color:rgba(0,200,255,.35);margin-bottom:6px;">// want to collaborate?</div>
+      <div style="color:rgba(168,216,240,.65);">Mithilesh is open to volunteering, event coordination, and interesting projects.</div>
+      <div style="color:rgba(168,216,240,.65);">Reach out via <span style="color:#00c8ff">LinkedIn</span> or <span style="color:#00c8ff">GitHub</span> above.</div>
+    </div>
+  `;
+
+  const rowsEl = document.getElementById('ports-rows');
+  rows.forEach(r=>{
+    const div = document.createElement('div');
+    div.style.cssText = 'display:grid;grid-template-columns:60px 90px 140px 1fr 110px;gap:0 16px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,200,255,.07);';
+    div.innerHTML = `
+      <div style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:12px;">${escHtml(r.port)}</div>
+      <div style="color:rgba(0,200,255,.5);font-size:12px;">${escHtml(r.proto)}</div>
+      <div style="color:#a8d8f0;display:flex;align-items:center;gap:6px;font-size:13px;">${r.icon} ${escHtml(r.service)}</div>
+      <div style="color:rgba(168,216,240,.55);font-size:12.5px;">${escHtml(r.info)}</div>
+      <div><a href="${escHtml(r.href)}" target="_blank" rel="noopener" style="border:1px solid rgba(255,215,64,.4);color:#ffd740;padding:3px 10px;font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">↗ ${escHtml(r.action)}</a></div>
+    `;
+    rowsEl.appendChild(div);
+  });
+}
+
+/* ─────────────────────────────── CLOCK ─── */
+function updateClock(){
+  const t=document.getElementById('t-time');
+  if(t) t.textContent=new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock,1000);updateClock();
+
+/* ─────────────────────────────── TERMINAL ─── */
+const out=document.getElementById('t-output');
+const dbgOut=document.getElementById('debug-content');
+
+function addLine(html,cls='',target=out){
+  const el=document.createElement('div');
+  el.className='ol type-anim'+(cls?' '+cls:'');
+  el.innerHTML=html;
+  target.appendChild(el);
+  target.scrollTop=target.scrollHeight;
+  return el;
+}
+function addDebugLine(html,cls=''){return addLine(html,cls,dbgOut);}
+function addPrompt(cmd){
+  const el=document.createElement('div');
+  el.className='pl';
+  el.innerHTML=`<span style="color:#00c8ff">▶</span><span style="color:rgba(0,200,255,.5);margin:0 4px">mithilesh@friday</span><span style="color:rgba(0,200,255,.3)">:~$</span><span style="margin-left:6px">${escHtml(cmd)}</span>`;
+  out.appendChild(el);
+  out.scrollTop=out.scrollHeight;
+}
+function nl(){addLine('');}
+function setStatus(txt){const el=document.getElementById('t-status-txt');if(el)el.textContent=txt;}
+
+/* ─────────────────────────────── COMMANDS ─── */
+const CMDS={
+  help(){
+    nl();
+    addLine(`<span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px">[ FRIDAY COMMAND INDEX ]</span>`);
+    nl();
+    [['about','Who I am & my story'],['skills','Capability matrix'],['projects','Things I have built'],['education','Academic records'],
+     ['volunteer','Field operations & community'],['github','Live GitHub activity'],['resume','Download my resume'],['contact','Get in touch'],
+     ['ask [q]','Chat with FRIDAY AI'],['clear','Clear terminal'],['non tech','Switch to visual HUD']
+    ].forEach(([c,d])=>{
+      addLine(`  <span style="color:#00c8ff;display:inline-block;min-width:180px;font-family:'Orbitron',monospace;font-size:11px">${c}</span><span style="color:rgba(0,200,255,.35)"> // ${d}</span>`);
+    });
+    nl();
+  },
+  about(){
+    nl();
+    addLine(`<span style="color:#fff;font-family:'Orbitron',monospace;font-size:13px;letter-spacing:2px">◆ ${ME.name}</span>`);
+    addLine(`<span style="color:rgba(0,200,255,.6);font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px">${ME.role.toUpperCase()}  ·  ${ME.location.toUpperCase()}</span>`);
+    nl();
+    addLine(`<span style="color:#a8d8f0">${ME.bio}</span>`);
+    nl();
+    addLine(`<span style="color:rgba(0,200,255,.3)">── FAST LINKS ──────────────────────────</span>`);
+    addLine(`  <span class="chip" onclick="runCmd('skills')">skills</span><span class="chip" onclick="runCmd('projects')">projects</span><span class="chip" onclick="runCmd('volunteer')">volunteer</span><span class="chip" onclick="runCmd('github')">github</span>`);
+    nl();
+  },
+  skills(){
+    nl();
+    addLine(`<span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px">[ CAPABILITY MATRIX ]</span>`);
+    nl();
+    addLine(`<span style="color:rgba(0,200,255,.5);font-size:11px">INDUSTRY KNOWLEDGE</span>`);
+    ME.skills.industry.forEach(([s,l])=>addLine(`  <span class="tag tag-b">${escHtml(s)}</span> <span style="color:${levelColor(l)};font-size:11px">${l}</span>`));
+    nl();
+    addLine(`<span style="color:rgba(0,200,255,.5);font-size:11px">TOOLS & TECHNOLOGIES</span>`);
+    ME.skills.tools.forEach(([s,l])=>addLine(`  <span class="tag tag-y">${escHtml(s)}</span> <span style="color:${levelColor(l)};font-size:11px">${l}</span>`));
+    nl();
+    addLine(`<span style="color:rgba(0,200,255,.5);font-size:11px">SOFT SKILLS</span>`);
+    ['Volunteering','Event Coordination','Leadership','Teamwork','Photography'].forEach(s=>addLine(`  <span class="tag tag-g">${s}</span>`));
+    nl();
+  },
+  async projects(){
+    nl();
+    addLine(`<span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px">[ PROJECTS ]</span>`);
+    nl();
+    const loading=addLine(`<span style="color:rgba(0,200,255,.5)">Loading projects…</span>`);
+    setStatus('FETCHING');
+    const list=await getProjects();
+    setStatus('READY');
+    loading.remove();
+    if(list===null){
+      addLine(`<span style="color:#ff5252">⚠ Could not reach GitHub.</span> <span style="color:rgba(168,216,240,.6)">Browse them directly at</span> <a class="t-link" href="https://github.com/${ME.github}?tab=repositories" target="_blank" rel="noopener">github.com/${ME.github}</a>`);
+      nl();return;
+    }
+    if(!list.length){
+      addLine(`<span style="color:rgba(168,216,240,.6)">No public projects yet — more coming soon. Check</span> <a class="t-link" href="https://github.com/${ME.github}" target="_blank" rel="noopener">github.com/${ME.github}</a>`);
+      nl();return;
+    }
+    list.forEach(p=>{
+      addLine(`<span style="color:#a8d8f0;font-weight:600">◇ ${escHtml(p.name)}</span>`);
+      addLine(`  <span style="color:rgba(168,216,240,.65)">${escHtml(p.desc)}</span>`);
+      if(p.tech&&p.tech.length) addLine('  '+p.tech.map(t=>`<span class="tag tag-b">${escHtml(t)}</span>`).join(''));
+      const links=[];
+      if(safeUrl(p.repo)) links.push(`<a class="t-link" href="${escHtml(p.repo)}" target="_blank" rel="noopener">repo ↗</a>`);
+      if(safeUrl(p.demo)) links.push(`<a class="t-link" href="${escHtml(p.demo)}" target="_blank" rel="noopener">demo ↗</a>`);
+      if(links.length) addLine('  '+links.join('  '));
+      nl();
+    });
+  },
+  education(){
+    nl();
+    addLine(`<span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px">[ TRAINING RECORDS ]</span>`);
+    nl();
+    ME.education.forEach(e=>{
+      addLine(`<span style="color:#00c8ff;font-weight:600">◆ ${e.degree}</span>`);
+      addLine(`  <span style="color:rgba(0,200,255,.7)">${e.school}</span>  <span style="color:rgba(0,200,255,.35)">· ${e.period}</span>`);
+      if(e.note) addLine(`  <span class="tag tag-p">${e.note}</span>`);
+      nl();
+    });
+  },
+  volunteer(){
+    nl();
+    addLine(`<span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px">[ FIELD OPERATIONS ]</span>`);
+    nl();
+    ME.volunteer.forEach(v=>{
+      addLine(`<span style="color:#a8d8f0;font-weight:600">◇ ${v.role}</span>`);
+      addLine(`  <span style="color:rgba(0,200,255,.6)">${v.org}</span>${v.period?`  <span style="color:rgba(0,200,255,.3)">· ${v.period}</span>`:''}`);
+      addLine(`  <span class="tag tag-p">${v.cat}</span>`);
+      addLine(`  <span style="color:rgba(168,216,240,.65)">${v.desc}</span>`);
+      nl();
+    });
+  },
+  async github(){
+    nl();
+    addLine(`<span style="color:rgba(0,200,255,.5)">Scanning repositories for <span style="color:#00c8ff">techberry00</span>…</span>`);
+    setStatus('FETCHING');
+    const events=await fetchGitHub();
+    setStatus('READY');
+    if(!events){
+      addLine(`<span style="color:#ff5252">⚠ Could not reach GitHub API.</span>`);
+      nl();return;
+    }
+    if(!events.length){addLine(`<span style="color:rgba(0,200,255,.35)">No recent public activity.</span>`);nl();return;}
+    nl();
+    events.slice(0,8).forEach(e=>{
+      const{icon,text}=parseEvent(e);
+      const time=relTime(e.created_at);
+      const div=document.createElement('div');
+      div.className='github-event';
+      div.innerHTML=`<span class="ge-icon">${icon}</span><div><div>${text}</div><div class="ge-meta">${time}</div></div>`;
+      out.appendChild(div);
+    });
+    out.scrollTop=out.scrollHeight;
+    nl();
+  },
+  resume(){
+    nl();
+    if(CONFIG.RESUME_URL){
+      addLine(`  📄  <a class="t-link" href="${escHtml(CONFIG.RESUME_URL)}" target="_blank" rel="noopener">Open resume (PDF) ↗</a>`);
+    } else {
+      addLine(`<span style="color:rgba(168,216,240,.65)">Resume isn't posted here yet. Reach me on</span> <a class="t-link" href="https://${ME.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a> <span style="color:rgba(168,216,240,.65)">or by</span> <a class="t-link" href="mailto:${escHtml(EMAIL)}">email ↗</a><span style="color:rgba(168,216,240,.65)"> and I'll send it over.</span>`);
+    }
+    nl();
+  },
+  contact(){
+    nl();
+    addLine(`<span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px">[ COMMUNICATION CHANNELS ]</span>`);
+    nl();
+    addLine(`  ◉  <span style="color:#00c8ff">github.com/${ME.github}</span>`);
+    addLine(`  ◈  <span style="color:#00c8ff">${ME.linkedin}</span>`);
+    addLine(`  ✉  <a class="t-link" href="mailto:${escHtml(EMAIL)}">${escHtml(EMAIL)}</a>`);
+    addLine(`  ◎  <span style="color:#a8d8f0">${ME.location}</span>`);
+    nl();
+    addLine(`  <span style="color:rgba(0,200,255,.35)">// Open to connections, collaborations & opportunities</span>`);
+    nl();
+  },
+  clear(){out.innerHTML='';}
+};
+
+/* ─────────────────────────────── AUTOCOMPLETE ─── */
+const inp=document.getElementById('t-input');
+const ALL_CMDS = [
+  {label:'help',      desc:'see all commands'},
+  {label:'about',     desc:'who is Mithilesh'},
+  {label:'skills',    desc:'capability matrix'},
+  {label:'projects',  desc:'things I have built'},
+  {label:'education', desc:'academic records'},
+  {label:'volunteer', desc:'field operations'},
+  {label:'github',    desc:'live repo feed'},
+  {label:'resume',    desc:'download resume'},
+  {label:'contact',   desc:'get in touch'},
+  {label:'ask',       desc:'chat with Friday AI'},
+  {label:'clear',     desc:'clear terminal'},
+  {label:'non tech',  desc:'switch to visual HUD'},
+];
+
+const sugBar = document.getElementById('t-suggest');
+let selIdx = -1;
+let curSuggestions = [];
+
+function getSuggestions(val){
+  const v = val.toLowerCase().trim();
+  if(!v) return [];
+  return ALL_CMDS.filter(c=>c.label.startsWith(v) || c.label.includes(v));
+}
+
+function highlightMatch(label, query){
+  const q = query.toLowerCase().trim();
+  const idx = label.toLowerCase().indexOf(q);
+  if(idx === -1) return escHtml(label);
+  return escHtml(label.slice(0,idx))
+    + `<span class="t-sug-match">${escHtml(label.slice(idx,idx+q.length))}</span>`
+    + escHtml(label.slice(idx+q.length));
+}
+
+function renderSuggestions(val){
+  curSuggestions = getSuggestions(val);
+  selIdx = -1;
+  sugBar.innerHTML = '<span class="t-suggest-label">↹</span>';
+
+  if(!curSuggestions.length){
+    sugBar.classList.remove('open');
+    return;
+  }
+
+  curSuggestions.forEach((cmd, i)=>{
+    const el = document.createElement('span');
+    el.className = 't-sug';
+    el.dataset.idx = i;
+    el.innerHTML = `${highlightMatch(cmd.label, val)} <span style="color:rgba(0,200,255,.25);font-size:10px">// ${cmd.desc}</span>`;
+    el.addEventListener('mousedown', e=>{
+      e.preventDefault();
+      applySuggestion(i);
+    });
+    sugBar.appendChild(el);
+  });
+
+  const hint = document.createElement('span');
+  hint.className = 't-sug-key';
+  hint.textContent = 'TAB to cycle · ENTER to run';
+  sugBar.appendChild(hint);
+
+  sugBar.classList.add('open');
+}
+
+function setSelected(i){
+  const chips = sugBar.querySelectorAll('.t-sug');
+  chips.forEach(c=>c.classList.remove('sel'));
+  if(i >= 0 && i < chips.length){
+    chips[i].classList.add('sel');
+    selIdx = i;
+    inp.value = curSuggestions[i].label;
+  }
+}
+
+function applySuggestion(i){
+  if(i < 0 || i >= curSuggestions.length) return;
+  inp.value = curSuggestions[i].label;
+  selIdx = -1;
+  curSuggestions = [];
+  sugBar.classList.remove('open');
+  inp.focus();
+}
+
+inp.addEventListener('input', ()=>{
+  renderSuggestions(inp.value);
+});
+
+/* ─────────────────────────────── INPUT ─── */
+const hist=[];let hIdx=-1;
+
+inp.addEventListener('keydown',async e=>{
+  if(e.key==='Tab'){
+    e.preventDefault();
+    if(!curSuggestions.length) return;
+    const next = (selIdx+1) % curSuggestions.length;
+    setSelected(next);
+    return;
+  }
+  if(e.key==='Escape'){
+    sugBar.classList.remove('open');
+    curSuggestions=[];selIdx=-1;
+    return;
+  }
+  if(e.key==='Enter'){
+    const raw=inp.value.trim();
+    inp.value='';
+    sugBar.classList.remove('open');
+    curSuggestions=[];selIdx=-1;
+    if(!raw)return;
+    hist.unshift(raw);hIdx=-1;
+    addPrompt(raw);
+    const parts=raw.split(' ');
+    const cmd=parts[0].toLowerCase();
+    const args=parts.slice(1).join(' ');
+    const fullCmd=raw.toLowerCase().trim();
+    if(fullCmd==='non tech'||fullCmd==='non-tech'||fullCmd==='/non-tech'||fullCmd==='stark'){toggleMode();return;}
+    else if(cmd==='ask'){await streamAI(args||'Tell me about Mithilesh');}
+    else if(Object.prototype.hasOwnProperty.call(CMDS,cmd)){setStatus('RUNNING');await CMDS[cmd]();setStatus('READY');}
+    else{
+      addLine(`<span style="color:rgba(0,200,255,.4)">command not found:</span> <span style="color:#ff6464">${escHtml(cmd)}</span>  <span style="color:rgba(0,200,255,.3)">// try</span> <span class="chip" onclick="runCmd('help')">help</span>`);
+      nl();
+    }
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    hIdx=Math.min(hIdx+1,hist.length-1);
+    inp.value=hist[hIdx]||'';
+    renderSuggestions(inp.value);
+  } else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    hIdx=Math.max(hIdx-1,-1);
+    inp.value=hIdx===-1?'':hist[hIdx];
+    renderSuggestions(inp.value);
+  }
+});
+
+function runCmd(cmd){inp.value='';addPrompt(cmd);if(Object.prototype.hasOwnProperty.call(CMDS,cmd))CMDS[cmd]();}
+
+/* ─────────────────────────────── FRIDAY AI ─── */
+/* Offline answers built from the profile data, used when no proxy is
+   configured or the proxy can't be reached. */
+function localAnswer(q){
+  const s=q.toLowerCase();
+  const vols=ME.volunteer.map(v=>v.role).join(', ');
+  if(/volunt|communit|charity|event/.test(s))
+    return `Mithilesh has volunteered at UNB Saint John and at his school in Bahrain: ${vols}.`;
+  if(/photo|camera/.test(s))
+    return `Photography is one of Mithilesh's strongest skills. He was on the NMMUN Media Team and has done event photography.`;
+  if(/skill|python|tool|powerpoint|design|tech/.test(s))
+    return `Mithilesh is strong in photography and PowerPoint, comfortable with Python, graphic design and leadership, and is building his CS foundation at UNB. Try the "skills" command for the full list.`;
+  if(/project|built|build|github|code|repo/.test(s))
+    return `Type "projects" to see what Mithilesh has built, or "github" for his live activity feed.`;
+  if(/educat|study|school|universit|unb|degree|bahrain|graduat/.test(s))
+    return `Mithilesh is doing a BSc in Computer Science at the University of New Brunswick in Saint John (2024–2028). Before that he studied the science stream at New Millennium School Bahrain.`;
+  if(/contact|email|hire|reach|linkedin|resume|cv|intern|co-?op/.test(s))
+    return `You can reach Mithilesh on LinkedIn or by email. Type "contact" for the details.`;
+  if(/who|about|yourself|mithilesh/.test(s))
+    return `Mithilesh is a CS student at UNB Saint John who loves technology, design and community work, with a background in event coordination and photography.`;
+  return `I can answer from Mithilesh's profile while my live AI link is offline. Try asking about his volunteering, skills, education or photography, or type "help" for commands.`;
+}
+
+function aiBubble(label,text){
+  const bubble=document.createElement('div');
+  bubble.className='ai-bubble';
+  bubble.innerHTML=`<div class="ai-label">${label}</div><span style="color:#a8d8f0"></span>`;
+  bubble.lastChild.textContent=text;
+  out.appendChild(bubble);
+  out.scrollTop=out.scrollHeight;
+  return bubble;
+}
+
+async function streamAI(q){
+  nl();
+  CHAT_HISTORY.push({role:'user',content:q});
+
+  // No proxy configured → answer locally, never call the API from the browser
+  if(!CONFIG.AI_ENDPOINT){
+    const a=localAnswer(q);
+    aiBubble('FRIDAY · OFFLINE MODE',a);
+    CHAT_HISTORY.push({role:'assistant',content:a});
+    nl();return;
+  }
+
+  const thinking=addLine('<span class="ld">●</span><span class="ld"> ●</span><span class="ld"> ●</span> <span style="color:rgba(0,200,255,.4)">FRIDAY is processing…</span>');
+  setStatus('AI PROCESSING');
+
+  try{
+    const res=await fetch(CONFIG.AI_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:CHAT_HISTORY.slice(-10)})
+    });
+    if(!res.ok||!res.body) throw new Error('proxy error '+res.status);
+    thinking.remove();
+
+    const bubble=document.createElement('div');
+    bubble.className='ai-bubble';
+    bubble.innerHTML='<div class="ai-label">FRIDAY</div><span style="color:#a8d8f0"></span>';
+    out.appendChild(bubble);
+    const streamEl=bubble.lastChild;
+
+    const reader=res.body.getReader();
+    const decoder=new TextDecoder();
+    let full='',buf='';
+
+    while(true){
+      const{done,value}=await reader.read();
+      if(done)break;
+      buf+=decoder.decode(value,{stream:true});
+      const lines=buf.split('\n');
+      buf=lines.pop();           // keep any partial line for the next chunk
+      for(const line of lines){
+        if(!line.startsWith('data:'))continue;
+        const data=line.slice(5).trim();
+        if(!data||data==='[DONE]')continue;
+        try{
+          const j=JSON.parse(data);
+          if(j.type==='content_block_delta'&&j.delta&&j.delta.text){
+            full+=j.delta.text;
+            streamEl.textContent=full;
+            out.scrollTop=out.scrollHeight;
+          }
+        }catch{}
+      }
+    }
+    if(!full) throw new Error('empty response');
+    CHAT_HISTORY.push({role:'assistant',content:full});
+  }catch(err){
+    thinking.remove();
+    const a=localAnswer(q);
+    aiBubble('FRIDAY · OFFLINE MODE',a);
+    CHAT_HISTORY.push({role:'assistant',content:a});
+  }
+  setStatus('READY');
+  nl();
+}
+
+/* ─────────────────────────────── GITHUB ─── */
+const GH_TTL=10*60*1000;   // cache for 10 min per tab so we stay under the API rate limit
+
+function cacheGet(key){
+  try{
+    const c=JSON.parse(sessionStorage.getItem(key)||'null');
+    if(c&&Date.now()-c.t<GH_TTL) return c.v;
+  }catch{}
+  return null;
+}
+function cacheSet(key,v){
+  try{sessionStorage.setItem(key,JSON.stringify({t:Date.now(),v}));}catch{}
+}
+function setRepoCount(n){
+  const el=document.getElementById('s-repos');
+  if(el&&n!=null)el.textContent=n;
+}
+
+let ghPromise=null;
+function fetchGitHub(){
+  if(ghPromise) return ghPromise;
+  ghPromise=(async()=>{
+    const cached=cacheGet('gh_feed');
+    if(cached){setRepoCount(cached.repos);return cached.events;}
+    try{
+      const[evRes,userRes]=await Promise.all([
+        fetch(`https://api.github.com/users/${ME.github}/events/public?per_page=15`),
+        fetch(`https://api.github.com/users/${ME.github}`)
+      ]);
+      let repos=null;
+      if(userRes.ok){
+        const u=await userRes.json();
+        repos=u.public_repos??null;
+        setRepoCount(repos);
+      }
+      if(!evRes.ok)return null;
+      const events=await evRes.json();
+      cacheSet('gh_feed',{events,repos});
+      return events;
+    }catch{return null;}
+  })().then(r=>{ if(r===null) ghPromise=null; return r; });
+  return ghPromise;
+}
+
+function parseEvent(e){
+  const repo=e.repo?.name||'unknown';
+  const short=escHtml(repo.split('/')[1]||repo);
+  const ref=escHtml(e.payload?.ref||'');
+  const refType=escHtml(e.payload?.ref_type||'repo');
+  const action=escHtml(e.payload?.action||'opened');
+  switch(e.type){
+    case'PushEvent':{const n=e.payload?.commits?.length||1;return{icon:'⬆',text:`Pushed ${n} commit${n>1?'s':''} to <span style="color:#00c8ff">${short}</span>`};}
+    case'CreateEvent':return{icon:'✨',text:`Created ${refType} <span style="color:rgba(0,200,255,.8)">${ref||short}</span>`};
+    case'WatchEvent':return{icon:'⭐',text:`Starred <span style="color:#ffd740">${short}</span>`};
+    case'ForkEvent':return{icon:'🍴',text:`Forked <span style="color:#c878ff">${short}</span>`};
+    case'IssuesEvent':return{icon:'🐛',text:`${action} issue in <span style="color:#00c8ff">${short}</span>`};
+    case'PullRequestEvent':return{icon:'🔀',text:`${action} PR in <span style="color:rgba(0,200,255,.8)">${short}</span>`};
+    case'DeleteEvent':return{icon:'🗑',text:`Deleted ${refType} from <span style="color:rgba(0,200,255,.4)">${short}</span>`};
+    default:return{icon:'⚡',text:`Activity on <span style="color:#00c8ff">${short}</span>`};
+  }
+}
+
+function relTime(ts){
+  const diff=(Date.now()-new Date(ts))/1000;
+  if(diff<60)return'just now';
+  if(diff<3600)return`${Math.floor(diff/60)}m ago`;
+  if(diff<86400)return`${Math.floor(diff/3600)}h ago`;
+  return`${Math.floor(diff/86400)}d ago`;
+}
+
+async function loadGitHubStark(){
+  const feed=document.getElementById('s-github-feed');
+  if(!feed||feed.dataset.loaded)return;
+  const events=await fetchGitHub();
+  if(!events||!events.length){
+    feed.innerHTML='<div style="font-family:\'Orbitron\',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,.45);">NO RECENT PUBLIC ACTIVITY</div>';
+    return;
+  }
+  feed.innerHTML='';
+  events.slice(0,8).forEach(e=>{
+    const{icon,text}=parseEvent(e);
+    const time=relTime(e.created_at);
+    const div=document.createElement('div');
+    div.className='s-event';
+    div.innerHTML=`<div class="s-event-icon">${icon}</div><div><div class="s-event-text">${text}</div><div class="s-event-time">${time}</div></div>`;
+    feed.appendChild(div);
+  });
+  feed.dataset.loaded='1';
+}
+
+/* ─────────────────────────────── PROJECTS ─── */
+/* Returns an array of projects, or null if GitHub couldn't be reached.
+   Uses ME.projects if you've filled it in, else your public non-fork repos. */
+async function getProjects(){
+  if(ME.projects.length) return ME.projects;
+  let repos=cacheGet('gh_repos');
+  if(!repos){
+    try{
+      const r=await fetch(`https://api.github.com/users/${ME.github}/repos?sort=pushed&per_page=30`);
+      if(!r.ok) return null;
+      repos=await r.json();
+      cacheSet('gh_repos',repos);
+    }catch{return null;}
+  }
+  return repos
+    .filter(r=>!r.fork&&!r.archived)
+    .sort((a,b)=>(b.stargazers_count-a.stargazers_count)||(new Date(b.pushed_at)-new Date(a.pushed_at)))
+    .slice(0,6)
+    .map(r=>({
+      name:r.name,
+      desc:r.description||'No description yet.',
+      tech:[r.language].filter(Boolean),
+      repo:r.html_url,
+      demo:r.homepage||''
+    }));
+}
+
+async function loadProjectsStark(){
+  const box=document.getElementById('s-projects');
+  if(!box||box.dataset.loaded)return;
+  const list=await getProjects();
+  if(list===null){
+    box.innerHTML=`<div class="s-card-body">Couldn't reach GitHub right now. Browse the repos at <a href="https://github.com/${ME.github}?tab=repositories" target="_blank" rel="noopener" style="color:#00c8ff">github.com/${ME.github}</a>.</div>`;
+    return;
+  }
+  if(!list.length){
+    box.innerHTML=`<div class="s-card-body">No public projects yet — more coming soon. Follow along at <a href="https://github.com/${ME.github}" target="_blank" rel="noopener" style="color:#00c8ff">github.com/${ME.github}</a>.</div>`;
+    box.dataset.loaded='1';
+    return;
+  }
+  box.innerHTML='';
+  list.forEach(p=>{
+    const card=document.createElement('div');
+    card.className='s-card';
+    const links=[];
+    if(safeUrl(p.repo)) links.push(`<a href="${escHtml(p.repo)}" target="_blank" rel="noopener">REPO ↗</a>`);
+    if(safeUrl(p.demo)) links.push(`<a href="${escHtml(p.demo)}" target="_blank" rel="noopener">DEMO ↗</a>`);
+    card.innerHTML=`
+      <div class="s-card-icon">◇</div>
+      <div class="s-card-title">${escHtml(p.name)}</div>
+      <div class="s-card-body">${escHtml(p.desc)}</div>
+      ${p.tech&&p.tech.length?`<div class="s-card-footer">${p.tech.map(t=>`<span class="s-pill">${escHtml(t)}</span>`).join('')}</div>`:''}
+      ${links.length?`<div class="s-card-links">${links.join('')}</div>`:''}`;
+    box.appendChild(card);
+  });
+  box.dataset.loaded='1';
+}
+
+/* ─────────────────────────────── FRIDAY WELCOME PANEL ─── */
+function injectFridayPanel(){
+  const panel=document.createElement('div');
+  panel.id='friday-panel';  panel.style.cssText=`
+    display:flex;gap:0;border:1px solid rgba(0,200,255,.2);margin:8px 0 12px;
+    background:rgba(0,10,22,.85);animation:fridayFadeIn .5s ease both;
+    font-family:'Share Tech Mono',monospace;
+  `;
+  panel.innerHTML=`
+    <style>
+      @keyframes fridayFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+      @keyframes botBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+      @keyframes eyePulse{0%,100%{background:#00c8ff;box-shadow:0 0 6px #00c8ff;}50%{background:#80eeff;box-shadow:0 0 14px #00c8ff,0 0 4px #fff;}}
+      @keyframes antennaGlow{0%,100%{box-shadow:0 0 4px rgba(0,200,255,.4);}50%{box-shadow:0 0 12px #00c8ff,0 0 20px rgba(0,200,255,.4);}}
+      #fri-bot{animation:botBob 3s ease-in-out infinite;}
+      .fri-eye{animation:eyePulse 2s ease-in-out infinite;}
+      .fri-eye:last-child{animation-delay:.3s;}
+      .fri-antenna-dot{animation:antennaGlow 1.8s ease-in-out infinite;}
+    </style>
+
+    <div style="width:220px;flex-shrink:0;border-right:1px solid rgba(0,200,255,.15);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px 16px;background:rgba(0,200,255,.02);gap:12px;">
+
+      <div id="fri-bot">
+        <svg width="80" height="96" viewBox="0 0 80 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="37" y="2" width="6" height="12" rx="1" fill="rgba(0,200,255,.3)"/>
+          <circle cx="40" cy="2" r="4" fill="#00c8ff" class="fri-antenna-dot"/>
+          <rect x="14" y="12" width="52" height="38" rx="4" fill="#011828" stroke="rgba(0,200,255,.5)" stroke-width="1.5"/>
+          <rect x="16" y="14" width="48" height="34" rx="3" fill="rgba(0,200,255,.03)"/>
+          <rect x="22" y="22" width="14" height="10" rx="2" fill="#001a2e"/>
+          <rect x="44" y="22" width="14" height="10" rx="2" fill="#001a2e"/>
+          <rect x="25" y="24" width="8" height="6" rx="1" class="fri-eye" fill="#00c8ff"/>
+          <rect x="47" y="24" width="8" height="6" rx="1" class="fri-eye" fill="#00c8ff"/>
+          <rect x="24" y="38" width="32" height="4" rx="2" fill="rgba(0,200,255,.2)"/>
+          <rect x="24" y="38" width="10" height="4" rx="2" fill="rgba(0,200,255,.6)"/>
+          <rect x="34" y="50" width="12" height="6" rx="1" fill="rgba(0,200,255,.2)"/>
+          <rect x="10" y="56" width="60" height="32" rx="4" fill="#011828" stroke="rgba(0,200,255,.4)" stroke-width="1.5"/>
+          <rect x="18" y="62" width="44" height="20" rx="2" fill="rgba(0,200,255,.06)" stroke="rgba(0,200,255,.2)" stroke-width="1"/>
+          <circle cx="40" cy="72" r="6" fill="rgba(0,200,255,.1)" stroke="rgba(0,200,255,.4)" stroke-width="1"/>
+          <circle cx="40" cy="72" r="3" fill="#00c8ff" opacity=".7"/>
+          <rect x="20" y="65" width="6" height="3" rx="1" fill="rgba(0,200,255,.4)"/>
+          <rect x="54" y="65" width="6" height="3" rx="1" fill="rgba(255,215,64,.4)"/>
+          <rect x="0" y="58" width="10" height="22" rx="3" fill="#011828" stroke="rgba(0,200,255,.3)" stroke-width="1"/>
+          <rect x="70" y="58" width="10" height="22" rx="3" fill="#011828" stroke="rgba(0,200,255,.3)" stroke-width="1"/>
+          <rect x="18" y="88" width="14" height="8" rx="2" fill="#011828" stroke="rgba(0,200,255,.3)" stroke-width="1"/>
+          <rect x="48" y="88" width="14" height="8" rx="2" fill="#011828" stroke="rgba(0,200,255,.3)" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <div style="text-align:center;">
+        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#fff;letter-spacing:2px;">Hi, I'm Friday!</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(0,200,255,.55);margin-top:4px;letter-spacing:1px;">Mithilesh's AI Assistant</div>
+      </div>
+
+      <div style="border-top:1px solid rgba(0,200,255,.1);padding-top:10px;width:100%;text-align:center;">
+        <div style="font-size:10px;color:rgba(0,200,255,.35);letter-spacing:1px;">${CONFIG.AI_ENDPOINT?'claude · anthropic':'offline mode'}</div>
+        <div style="font-size:10px;color:rgba(0,200,255,.35);margin-top:3px;letter-spacing:1px;">CS Student @ UNB · Saint John, CA</div>
+      </div>
+    </div>
+
+    <div style="flex:1;padding:20px 24px;display:flex;gap:24px;flex-wrap:wrap;">
+
+      <div style="flex:1;min-width:180px;">
+        <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:#00c8ff;margin-bottom:12px;text-transform:uppercase;display:flex;align-items:center;gap:8px;">
+          <span style="width:4px;height:4px;background:#00c8ff;box-shadow:0 0 6px #00c8ff;display:inline-block;"></span>
+          Getting Started
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div>Type <span class="chip" onclick="runCmd('help')" style="font-size:11px;">help</span> <span style="color:rgba(168,216,240,.5)">to see all commands</span></div>
+          <div>Type <span class="chip" onclick="runCmd('about')" style="font-size:11px;">about</span> <span style="color:rgba(168,216,240,.5)">to learn about Mithilesh</span></div>
+          <div>Type <span class="chip" onclick="runCmd('projects')" style="font-size:11px;">projects</span> <span style="color:rgba(168,216,240,.5)">to see what he's built</span></div>
+          <div>Or <span class="chip" onclick="focusAsk()" style="font-size:11px;">ask Friday</span> <span style="color:rgba(168,216,240,.5)">anything in natural language!</span></div>
+        </div>
+      </div>
+
+      <div style="flex:1;min-width:180px;">
+        <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:#ffd740;margin-bottom:12px;text-transform:uppercase;display:flex;align-items:center;gap:8px;">
+          <span style="width:4px;height:4px;background:#ffd740;box-shadow:0 0 6px #ffd740;display:inline-block;"></span>
+          Quick Tips
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:rgba(168,216,240,.55);">
+          <div><span style="color:rgba(0,200,255,.6)">↑ ↓</span> Arrow keys for command history</div>
+          <div>Try <span style="color:#00c8ff">non tech</span> for visual HUD mode</div>
+          <div>Check the tabs above for quick nav</div>
+          <div>Use <span style="color:#00c8ff">ask [question]</span> to chat with me</div>
+        </div>
+      </div>
+
+    </div>
+  `;
+  out.appendChild(panel);
+  out.scrollTop=out.scrollHeight;
+}
+
+function focusAsk(){
+  inp.value='ask ';
+  inp.focus();
+  const len=inp.value.length;
+  inp.setSelectionRange(len,len);
+}
+
+/* ─────────────────────────────── DEBUG CONSOLE BOOT ─── */
+let debugRunning = false;
+
+function dbg(type, text){
+  const colors={LOG:'rgba(168,216,240,.5)',WRN:'#ffd740',ERR:'#ff5252',SUC:'#69ff47'};
+  const labels={
+    LOG:`<span style="color:rgba(0,200,255,.3);min-width:36px;display:inline-block;font-size:11px">LOG</span>`,
+    WRN:`<span style="color:#ffd740;min-width:36px;display:inline-block;font-size:11px">WRN</span>`,
+    ERR:`<span style="color:#ff5252;min-width:36px;display:inline-block;font-size:11px">ERR</span>`,
+    SUC:`<span style="color:#69ff47;min-width:36px;display:inline-block;font-size:11px">SUC</span>`,
+  };
+  const color=colors[type]||colors.LOG;
+  const label=labels[type]||labels.LOG;
+  addDebugLine(`${label}  <span style="color:${color}">${text}</span>`);
+}
+
+function levelLine(label, level){
+  const color=levelColor(level);
+  const filled=level==='Strong'?3:level==='Comfortable'?2:1;
+  const blocks=`<span style="color:${color}">`+'█'.repeat(filled*4)+'</span>'+`<span style="color:rgba(0,200,255,.15)">`+'█'.repeat(12-filled*4)+'</span>';
+  addDebugLine(`<span style="color:rgba(0,200,255,.3);min-width:36px;display:inline-block;font-size:11px">LOG</span>  <span style="color:rgba(168,216,240,.5)">${label}</span> ${blocks} <span style="color:${color}">${level}</span>`);
+}
+
+async function runDebugConsole(){
+  if(debugRunning) return;
+  debugRunning = true;
+
+  dbgOut.innerHTML = '';
+
+  addDebugLine(`<span style="color:rgba(0,200,255,.25)">DEBUG CONSOLE  ·  mithilesh.js  ·  runtime v2026.1</span>`);
+  addDebugLine('');
+
+  const steps=[
+    ()=>dbg('LOG','Initializing mithilesh.js runtime...'),
+    ()=>dbg('LOG','Loading module: <span style="color:#00c8ff">"photography"</span>... ✓'),
+    ()=>dbg('LOG','Loading module: <span style="color:#00c8ff">"volunteering"</span>... ✓'),
+    ()=>dbg('LOG','Loading module: <span style="color:#00c8ff">"leadership"</span>... ✓'),
+    ()=>dbg('WRN','sleep() deprecated in mithilesh.js — use <span style="color:#00c8ff">"build_things()"</span> instead'),
+    ()=>dbg('LOG','Running diagnostics on life.js...'),
+    ()=>dbg('LOG','✓ ambition: <span style="color:#69ff47">HIGH</span>'),
+    ()=>dbg('LOG','✓ coffee_dependency: <span style="color:#a8d8f0">true (non-negotiable)</span>'),
+    ()=>dbg('LOG','✓ location: <span style="color:#a8d8f0">Saint John, NB → Canada</span>'),
+    ()=>dbg('LOG','✓ screenplay_buffer: <span style="color:#a8d8f0">events queued</span>'),
+    ()=>dbg('LOG','✓ github_commits: <span style="color:#a8d8f0">within normal range</span>'),
+    ()=>dbg('ERR','X free_time: undefined <span style="color:rgba(255,82,82,.6)">(known issue, filed as bug #404)</span>'),
+    ()=>dbg('LOG',''),
+    ()=>dbg('LOG','Checking skill tree...'),
+    ()=>levelLine('Photography:      ','Strong'),
+    ()=>levelLine('Event Photography:','Strong'),
+    ()=>levelLine('Graphic Design:   ','Comfortable'),
+    ()=>levelLine('Python:           ','Comfortable'),
+    ()=>levelLine('MS PowerPoint:    ','Strong'),
+    ()=>levelLine('Volunteering:     ','Strong'),
+    ()=>dbg('WRN','Memory leak detected in procrastination.ts — auto-patched'),
+    ()=>dbg('LOG',''),
+    ()=>dbg('LOG','Deploying personality to production...'),
+    ()=>dbg('LOG','Port 3000: listening <span style="color:rgba(0,200,255,.4)">(portfolio)</span>'),
+    ()=>dbg('LOG','Port 8080: listening <span style="color:rgba(0,200,255,.4)">(ambitions)</span>'),
+    ()=>dbg('LOG','Port 9000: listening <span style="color:rgba(0,200,255,.4)">(ideas)</span>'),
+    ()=>dbg('SUC','All systems nominal. Mithilesh is online. 🚀'),
+  ];
+
+  for(const fn of steps){
+    await new Promise(r=>setTimeout(r,80));
+    fn();
+  }
+
+  await new Promise(r=>setTimeout(r,200));
+  addDebugLine('');
+  addDebugLine(`<span style="color:rgba(0,200,255,.25)">// Easter eggs — switch to Terminal tab and try:</span>`);
+  addDebugLine('');
+
+  const eggs=[
+    [`<span class="chip" onclick="switchPanel('terminal');setTimeout(()=>{inp.value='ask what makes Mithilesh unique?';inp.focus()},100)">ask [anything]</span>`,'# Chat with FRIDAY AI'],
+    [`<span class="chip" onclick="switchPanel('terminal');setTimeout(()=>runCmd('skills'),100)">skills</span>`,'# Capability matrix'],
+    [`<span class="chip" onclick="switchPanel('terminal');setTimeout(()=>runCmd('projects'),100)">projects</span>`,'# What I have built'],
+    [`<span class="chip" onclick="switchPanel('terminal');setTimeout(()=>runCmd('github'),100)">github</span>`,'# Live repo activity'],
+  ];
+
+  const row1=document.createElement('div');
+  row1.style.cssText='display:flex;gap:32px;flex-wrap:wrap;padding:2px 0;';
+  const row2=document.createElement('div');
+  row2.style.cssText='display:flex;gap:32px;flex-wrap:wrap;padding:2px 0;';
+
+  eggs.forEach(([cmd,comment],i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:8px;font-size:12px;';
+    div.innerHTML=`<span style="color:rgba(0,200,255,.4)">▶</span> ${cmd} <span style="color:rgba(0,200,255,.25)">${comment}</span>`;
+    (i<2?row1:row2).appendChild(div);
+  });
+  dbgOut.appendChild(row1);
+  dbgOut.appendChild(row2);
+  addDebugLine('');
+
+  debugRunning = false;
+}
+
+/* ─────────────────────────────── BOOT ─── */
+async function boot(){
+  // HUD-mode contact + resume links driven by CONFIG
+  const em=document.getElementById('s-email-link');
+  if(em){em.href='mailto:'+EMAIL;em.style.display='';document.getElementById('s-email-text').textContent=EMAIL;}
+  if(CONFIG.RESUME_URL){
+    const w=document.getElementById('s-resume-wrap'),a=document.getElementById('s-resume-link');
+    if(w&&a){a.href=CONFIG.RESUME_URL;w.style.display='';}
+  }
+  loadExplorerActivity();
+  await new Promise(r=>setTimeout(r,200));
+  await resetTerminal();
+  inp.focus();
+}
+
+async function resetTerminal(){
+  out.innerHTML = '';
+
+  const aiStatus = CONFIG.AI_ENDPOINT
+    ? `<span style="color:rgba(105,255,71,.7)">✓ ready</span>`
+    : `<span style="color:#ffd740">offline mode</span> <span style="color:rgba(0,200,255,.3)">— answers from profile</span>`;
+
+  const initLines = [
+    [0,   'mu', `<span style="color:rgba(0,200,255,.4)">Friday</span><span style="color:rgba(0,200,255,.2)">@portfolio</span> <span style="color:rgba(0,200,255,.15)">~$</span> <span style="color:rgba(168,216,240,.5)">./init.sh --env=production</span>`],
+    [160, 'mu', `<span style="color:rgba(0,200,255,.2)">[  0.001s]</span> <span style="color:rgba(168,216,240,.35)">Loading kernel modules...</span>`],
+    [260, 'mu', `<span style="color:rgba(0,200,255,.2)">[  0.042s]</span> <span style="color:rgba(0,200,255,.5)">import</span> <span style="color:rgba(168,216,240,.4)">{ FridayAI, NeuralCore }</span> <span style="color:rgba(0,200,255,.5)">from</span> <span style="color:rgba(105,255,71,.5)">'@friday/core'</span>`],
+    [260, 'mu', `<span style="color:rgba(0,200,255,.2)">[  0.098s]</span> <span style="color:rgba(0,200,255,.5)">import</span> <span style="color:rgba(168,216,240,.4)">{ Portfolio, GitHubFeed }</span> <span style="color:rgba(0,200,255,.5)">from</span> <span style="color:rgba(105,255,71,.5)">'@mithilesh/portfolio'</span>`],
+    [260, 'mu', `<span style="color:rgba(0,200,255,.2)">[  0.134s]</span> <span style="color:rgba(168,216,240,.35)">Mounting profile</span> <span style="color:rgba(0,200,255,.5)">techberry00</span><span style="color:rgba(168,216,240,.35)">...</span>`],
+    [260, 'mu', `<span style="color:rgba(0,200,255,.2)">[  0.287s]</span> <span style="color:rgba(168,216,240,.35)">Neural link</span>   ${aiStatus}`],
+    [260, 'mu', `<span style="color:rgba(0,200,255,.2)">[  0.341s]</span> <span style="color:rgba(168,216,240,.35)">GitHub API</span>    <span style="color:rgba(105,255,71,.7)">✓ connected</span>  <span style="color:rgba(0,200,255,.3)">— techberry00</span>`],
+    [320, 'su', `<span style="color:rgba(0,200,255,.2)">[  0.412s]</span> <span style="color:#00c8ff;font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px">ALL SYSTEMS ONLINE</span> <span style="color:rgba(105,255,71,.6)">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>`],
+  ];
+
+  for(const [delay, cls, text] of initLines){
+    await new Promise(r=>setTimeout(r, delay));
+    addLine(text, cls);
+  }
+
+  await new Promise(r=>setTimeout(r, 600));
+
+  out.style.transition = 'opacity .3s ease';
+  out.style.opacity = '0';
+  await new Promise(r=>setTimeout(r, 300));
+
+  out.innerHTML = '';
+  out.style.opacity = '1';
+
+  injectFridayPanel();
+
+  await new Promise(r=>setTimeout(r, 150));
+  addLine(`<span style="color:rgba(0,200,255,.25)">// Type </span><span class="chip" onclick="runCmd('help')" style="font-size:11px">help</span><span style="color:rgba(0,200,255,.25)"> to begin or </span><span class="chip" onclick="focusAsk()" style="font-size:11px">ask Friday</span><span style="color:rgba(0,200,255,.25)"> anything</span>`);
+  addLine('');
+}
+
+boot();
+</script>
+</body>
+</html>
